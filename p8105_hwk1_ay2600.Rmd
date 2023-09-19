@@ -1,0 +1,87 @@
+---
+title: "Data Science HW 1"
+author: Hingling Yu
+date: 09/18/2023
+output: github_document
+geometry: margin=0.85in
+fontsize: 12pt
+  
+---
+## Problem 1
+
+```{r}
+library(moderndive)
+data("early_january_weather")
+?early_january_weather
+```
+
+The `early_january_weather` dataset provides a comprehensive snapshot of hourly meteorological readings for January 2013 at the Newark International Airport: EWR. This dataset is sourced from the `weather` data frame within the `nycflights13` package.
+
+### Variables in the Dataset
+
+-   **origin**: Denotes the weather station. The station is EWR.
+-   **year, month, day, hour**: Precisely time of recording.
+-   **temp and dewp**: Represent temperature and dew point both in Fahrenheit.
+-   **humid**: Provides the relative humidity as a percentage.
+-   **wind_dir, wind_speed, wind_gust**: Offer insights into wind patterns, including its direction (in degrees), speed, and gust speed, all in mph.
+-   **precip**: Measures precipitation in inches.
+-   **pressure**: Notes the sea-level pressure in millibars.
+-   **visib**: Reflects visibility in miles.
+-   **time_hour**: Captures both the date and hour of the recording as a `POSIXct` date.
+
+### Size of the Dataset
+
+-   The dataset consists of `r nrow(early_january_weather)` rows, representing hourly recordings, and `r ncol(early_january_weather)` variables.
+
+### Mean Temperature
+
+-   The average temperature observed during this period is `r mean(early_january_weather$temp, na.rm = TRUE)`°F.
+
+### Scatterplot
+```{r}
+library(ggplot2)
+
+plot <- ggplot(early_january_weather, aes(x = time_hour, y = temp, color = humid)) +
+  geom_point() +
+  labs(title = "Temperature vs. Time of Day", 
+       x = "Time (Date)", 
+       y = "Temperature (°F)") + 
+  scale_y_continuous(limits = c(20, 60)) + 
+  scale_x_datetime(breaks = "4 days") +
+  coord_cartesian(xlim = as.POSIXct(c("2013-01-01", "2013-01-16"))) + 
+  theme_minimal()
+
+print(plot)
+ggsave("scatterplot_temp_vs_time.png", plot)
+```
+Between January 1, 2013, and January 15, 2013, the data indicates a general upward trend in the daily mean temperature. Additionally, during this period, no discernible pattern was observed between humidity and the time of day.
+
+## Problem 2
+```{r}
+set.seed(123) 
+df <- data.frame(
+  sample_normal = rnorm(10),
+  logical_vector = rnorm(10) > 0,
+  char_vector = c("a", "b", "c", "d", "e", "f", "g", "h", "i", "j"),
+  factor_vector = factor(sample(c("Level 1", "Level 2", "Level 3"), 10, replace = TRUE))
+)
+```
+
+```{r}
+mean(df$sample_normal)  
+mean(df$logical_vector) 
+mean(df$char_vector)    
+mean(df$factor_vector)  
+```
+
+The random sample and logical vector are able to take mean. However, character vector and factor vector are not able to take mean.
+
+```{r, echo=TRUE, eval=FALSE}
+as.numeric(df$logical_vector)
+as.numeric(df$char_vector)
+as.numeric(df$factor_vector)
+```
+
+After applying the as.numeric function, logical variables are converted to numerical values, with TRUE represented as 1 and FALSE as 0. Factor vectors also undergo successful conversion to numerical values, corresponding to the levels of the factor. However, character vector fail to convert to numerical values because it lack a direct mapping from characters to numbers.
+
+Yes, `as.numeric` function is helpful to understand deeper about the types of variable and coercion.
